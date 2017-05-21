@@ -2,10 +2,46 @@
 <html>
 <head>
 	<title></title>
-	<link rel="stylesheet" type="text/css" href="src/css/style.css">
+	<link rel="stylesheet" type="text/css" href="src/css/style.css">	
 </head>
 <body>
 
+<div id="gameCointaner">
+	<div class="lightButton" id="greenButton">green</div>
+	<div class="lightButton" id="redButton">red</div>
+	<div class="lightButton" id="yelloButton">blue</div>
+	<div class="lightButton" id="blueButton">yellow</div>
+
+	<div id="optionController">
+		<h1>Simon</h1> <span>R</span>
+		<div id="contolPanel">
+			<div id="gameCounter">
+				<h1 id="gameCounter"></h1>
+				<h3>count</h3>
+			</div>
+			<div id="startGame">
+				<button id="startButton">start</button>
+				<h3>start</h3>
+			</div>
+			<div id="strictOption">
+				<span id="lightOnOff">o</span>
+				<button id="strictButton" >strict</button>
+				<h3>start</h3>
+			</div>			
+		</div>
+			<div id="onOff">
+				<button id="onOffButton">on/off</button>
+				<!-- on/off add somekind of switch -->
+				
+			</div>
+	</div>
+
+</div>
+
+<audio class="audioFile" src="https://s3.amazonaws.com/freecodecamp/simonSound1.mp3" type="audio/mpeg">
+<audio class="audioFile" src="https://s3.amazonaws.com/freecodecamp/simonSound2.mp3" type="audio/mpeg">
+<audio class="audioFile" src="https://s3.amazonaws.com/freecodecamp/simonSound3.mp3" type="audio/mpeg">
+<audio class="audioFile" src="https://s3.amazonaws.com/freecodecamp/simonSound4.mp3" type="audio/mpeg">
 <script type="text/javascript" src="src/js/script.js"></script>
 </body>
 </html>

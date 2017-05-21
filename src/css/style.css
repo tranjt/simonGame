@@ -1,3 +1,36 @@
 body {
 	
 }
+.lightButton {
+	width: 100px;
+	height: 50px;	
+}
+
+
+div#greenButton{
+	background-color:   #00b300;
+}
+
+div#redButton{
+	background-color:   #b30000;
+}
+div#yelloButton{
+	background-color:   #e6b800;
+}
+div#blueButton{
+	background-color:   #005ce6;
+}
+
+
+div#greenButton.light{
+	background-color:   #1aff1a;
+}
+div#redButton.light{
+	background-color:    #ff1a1a;
+}
+div#yelloButton.light{
+	background-color:   #ffff1a;
+}
+div#blueButton.light{
+	background-color: #1aa3ff;
+}
