@@ -1,11 +1,11 @@
 const lightButtons = document.querySelectorAll("div.lightButton");
 const audioFiles = document.querySelectorAll("audio.audioFile");
 const startButton = document.querySelector("button#startButton");
-const strictButton = document.querySelector("button#strictButton");
-const strictLight = document.querySelector("button#strictLight");
+const strictLightButton = document.querySelector("button#strictButton");
 const onOffButton = document.querySelector("button#onOffButton");
 const gameCounter = document.querySelector("h1#gameCounter");
 
+strictLightButton.addEventListener('click', strictOnOff);
 onOffButton.addEventListener('click', gameOnOff); 
 startButton.addEventListener('click', gameStart); 
 lightButtons.forEach(function(button) {
@@ -38,35 +38,30 @@ const events = {
   }
 };
 
-function gameOnOff() {
-//hook up if game is listening to player click or not
-	events.emit("TurnOnOff", event.target.className.split(" ")[1]);
 
+function gameOnOff() {	
+	events.emit("TurnOnOff","");
 }
 
-function gameStart() {
-	events.emit("StartGame", event.target.className.split(" ")[1]);
-// emit() game started call restart???
-//turn count on
-
+function gameStart() {	
+	events.emit("StartGame", "");
 }
 
 function makeMove(event){
-	events.emit("PlayerHasMoved", event.target.className.split(" ")[1]);	
-	//emit playerclicked
+	events.emit("PlayerHasMoved", event.target.className.split(" ")[1]);
 }
+
+function strictOnOff() {	
+	events.emit("StrictOnOff", strictLightButton);
+}
+
 
 /*
 	Game Board
 */
-//remove default mabye?
-const GameBoard = function (buttons = lightButtons, sounds = audioFiles) { //add sounds as arguemnt or make it ?
+const GameBoard = function (buttons = lightButtons, sounds = audioFiles) { 
 	this.buttons = buttons;
 	this.sounds = sounds;	
-}
-
-GameBoard.prototype.importSound = function(audioArr) { //not needed delte
-	this.sounds = audioArr;
 }
 
 GameBoard.prototype.buttonBlink = function(index, cssClass) {	
@@ -76,8 +71,7 @@ GameBoard.prototype.buttonBlink = function(index, cssClass) {
 	}, 550);
 }
 
-GameBoard.prototype.playsound = function(index) {
-	console.log("inside playsound " + index);
+GameBoard.prototype.playsound = function(index) {	
 	this.sounds[index].play();	
 }
 
@@ -92,11 +86,14 @@ const GameOption = function() {
 
 GameOption.prototype.setOnOff = function() {
 	this.gameOption.onoffState = this.gameOption.onoffState ? false : true;
-	if (this.gameOption.onoffState === false) {
-		this.gameOption.gameCounter = "";		
-	} 
-	else this.gameOption.gameCounter = 0;
-
+	if (this.gameOption.onoffState) {
+		this.gameOption.gameCounter = 0;
+	}
+	else {
+		this.gameOption.gameCounter = "";
+		this.gameOption.strict = false;
+		strictLightButton.classList.remove("strict");	
+	}
 	this.gameOption.updateGameCounter(gameCounter);	
 }
 
@@ -111,8 +108,12 @@ GameOption.prototype.displayeError = function(htmlgameCounter) {
 	}, 550);
 }
 
-GameOption.prototype.setStrict = function() { //function or just value
-	
+GameOption.prototype.setStrict = function(strictLightButton) { 
+	if (this.gameOption.onoffState) {
+		this.gameOption.strict  = this.gameOption.strict ? false : true;
+		if (this.gameOption.strict) strictLightButton.classList.add("strict");
+		else  strictLightButton.classList.remove("strict");	
+	}
 }
 
 /*
@@ -126,14 +127,14 @@ const SimonGame = function (gameBoard, gameOption) {
 	this.playerTurn = false;
 }
 
-
 SimonGame.prototype.init = function() { //hook up listener	
-	events.on("PlayerHasMoved", this.playerClicked.bind(this)); 	
+	events.on("PlayerHasMoved", this.handlePlayerClick.bind(this)); 	
 	events.on("StartGame", this.reStart.bind(this)); 
 	events.on("TurnOnOff", this.gameOption.setOnOff.bind(this));	
+	events.on("StrictOnOff", this.gameOption.setStrict.bind(this));	
 }
 
-SimonGame.prototype.reStart = function() { //reset stuff  //call getnextmove
+SimonGame.prototype.reStart = function() { 
 	if (this.gameOption.onoffState) {
 		this.playedList = [];
 		this.currentSelect = 0;
@@ -144,9 +145,7 @@ SimonGame.prototype.reStart = function() { //reset stuff  //call getnextmove
 	}
 }
 
-//if is full doNextMove
-//else playsequise again handlePlayerClick
-SimonGame.prototype.playerClicked = function(index) {
+SimonGame.prototype.handlePlayerClick = function(index) {
 	 if (this.playerTurn && this.gameOption.onoffState) {
 	 	this.playerTurn = false;		
 	 	let isValidMove = this.validateMove(index);
@@ -170,29 +169,29 @@ SimonGame.prototype.playerClicked = function(index) {
 				}
 				this.playerTurn = true;				
 			}
-			else {				
-				this.currentSelect = 0;//not needed already done in validate or remove the one in validate 
-				this.playSequence(this.playedList);
+			else {	
+				if (this.gameOption.strict) {
+					this.reStart();
+					return;
+				}	
+				else {
+					this.currentSelect = 0;
+					this.playSequence(this.playedList);
+				}	
 			}			 
 		}, 700);
 	}	
 }
 
-//if player select is true and it's not the last in playerList do ++
+
 SimonGame.prototype.validateMove = function(index) { 	
-	if (this.playedList[this.currentSelect] === parseInt(index) ) {				
-		console.log("validate true");
+	if (this.playedList[this.currentSelect] === parseInt(index) ) {			
 		return true;
-	}
-	//this.currentSelect = 0; //remove this instead clearer
-	console.log("validate false");
+	}		
 	return false;
 }
 
-/////// the lock out here instead 
-SimonGame.prototype.playSequence = function(stepList) { //remove default maybe
-	console.log("inside playSequence stepList.length " + stepList.length);
-	console.log(this.playedList);
+SimonGame.prototype.playSequence = function(stepList) { 
 	this.playerTurn = false;
 	for (let i = 0; i < stepList.length; i++) {
 		setTimeout(() => {			
@@ -213,34 +212,11 @@ SimonGame.prototype.doNextMove = function() {
 	}, 1000);			
 }
 
-
-const testgameBoard = new GameBoard();
-const testgameOption = new GameOption();
-const testgame = new SimonGame(testgameBoard, testgameOption); 
-testgame.init();
-
+const newgameBoard = new GameBoard();
+const newgameOption = new GameOption();
+const newgame = new SimonGame(newgameBoard, newgameOption); 
+newgame.init();
 
 
-
-
-
-//make player 
-//maker board
-//option
-
-// to start game switch start
-////hook up listener for buttons
-//game init set player turn etc
-// bot do nextmove, 
-////random generate next buttonplay, 
-////add to playedlist, 
-////then play it, 
-////swith to player
-
-
-//listen to player click validateMove 
-////if all ok, update score switch to bot move again, 
-////if wrong lock buttons player upt the playedlist again. then set player to aktive again.
-/////if wrong in strict mode game over?
-
-//if turn off reset turn off everything
+//User Story: I can win the game by getting a series of 20 steps correct. I am notified of my victory, then the game starts over.
+//do a wrapper display msg on top, ok button restart game 

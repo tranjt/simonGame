@@ -2,41 +2,44 @@
 <html>
 <head>
 	<title></title>
-	<link rel="stylesheet" type="text/css" href="src/css/style.css">	
+	<link rel="stylesheet" type="text/css" href="src/css/style.css">
+	
 </head>
 <body>
 
 <div id="gameCointaner">
-	<div class="lightButton 0" id="greenButton">green</div>
-	<div class="lightButton 1" id="redButton">red</div>
-	<div class="lightButton 2" id="yelloButton">blue</div>
-	<div class="lightButton 3" id="blueButton">yellow</div>
+	<div class="lightButton 0" id="greenButton"></div>
+	<div class="lightButton 1" id="redButton"></div>
+	<div class="lightButton 2" id="yelloButton"></div>
+	<div class="lightButton 3" id="blueButton"></div>
 
 	<div id="optionController">
-		<h1>Simon</h1> <span>R</span>
+		<h1 id="simonTitle">Simon</h1> 		
 		<div id="contolPanel">
 			<div id="gameCounter">
 				<h1 id="gameCounter"></h1>
-				<h3>count</h3>
+				<h3 id="gameCounter">Count</h3>
 			</div>
 			<div id="startGame">
-				<button id="startButton">start</button>
-				<!-- <h3>start</h3> -->
-			</div>
-			<div id="strictOption">
-				<span id="lightOnOff">o</span>
-				<button id="strictButton" >strict</button>
-				<h3>start</h3>
-			</div>			
-		</div>
-			<div id="onOff">
-				<button id="onOffButton">on/off</button>
-				<!-- on/off add somekind of switch -->
+				<div>
+					<button id="startButton">Start</button>
+				</div>
+				<div>				
+					<button id="strictButton" >Strict</button>
+				</div>
 				
 			</div>
+		
+			<div id="onOff">
+				<button id="onOffButton">On / Off</button>				
+				
+			</div>		
+		</div>
+		
 	</div>
 
 </div>
+
 
 <audio class="audioFile" src="https://s3.amazonaws.com/freecodecamp/simonSound1.mp3" type="audio/mpeg">
 <audio class="audioFile" src="https://s3.amazonaws.com/freecodecamp/simonSound2.mp3" type="audio/mpeg">
