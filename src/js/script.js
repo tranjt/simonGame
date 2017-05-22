@@ -101,7 +101,9 @@ function gameStart() {
 
 }
 
-function makeMove(){
+function makeMove(event){
+	events.emit("PlayerHasMoved", event.target.className.split(" ")[1]);
+	
 	//emit playerclicked
 }
 
@@ -112,7 +114,7 @@ const player = function () {
 	this.pressedButtons = [];
 	
 }
-//remove default shit
+//remove default mabye?
 const gameBoard = function (buttons = lightButtons, sounds = audioFiles) { //add sounds as arguemnt or make it ?
 	this.buttons = buttons;
 	this.sounds = sounds;	
@@ -126,10 +128,11 @@ gameBoard.prototype.buttonBlink = function(index, cssClass) {
 	this.buttons[index].classList.add(cssClass);
 	setTimeout (() => {
 		this.buttons[index].classList.remove(cssClass);
-	}, 700);
+	}, 550);
 }
 
 gameBoard.prototype.playsound = function(index) {
+	console.log("inside playsound " + index);
 	this.sounds[index].play();	
 }
 
@@ -162,13 +165,13 @@ const simonGame = function (player, gameBoard, gameOption) {
 	this.gameBoard = gameBoard;
 	this.gameOption = gameOption;
 	this.playedList = [];
+	this.currentSelect = 0;
 	this.playerTurn = false;
 }
 
 
-simonGame.prototype.init = function() { //hook up listener
-	//this.gameBoard.importSound(["src/sound/simonSound1.mp3", src/sound/simonSound1.mp3])
-	
+simonGame.prototype.init = function() { //hook up listener	
+	events.on("PlayerHasMoved", this.playerClicked.bind(this)); 	
 }
 
 simonGame.prototype.start = function() { //remove this just restart is fine?
@@ -176,43 +179,87 @@ simonGame.prototype.start = function() { //remove this just restart is fine?
 }
 
 simonGame.prototype.reStart = function() { //reset stuff  //call getnextmove
+	this.playedList = [];
+	this.currentSelect = 0;
+	this.playerTurn = false;
+	this.doNextMove();
+}
+
+//if is full doNextMove
+//else playsequise again
+simonGame.prototype.playerClicked = function(index) {
+	 if (this.playerTurn) {
+	 	this.playerTurn = false; //
+		this.gameBoard.buttonBlink(index, "light");
+		this.gameBoard.playsound(index);
+		
+		setTimeout (() =>{
+			if (this.validateMove(index)){				
+				if (this.currentSelect === this.playedList.length ) {					
+					this.currentSelect = 0;					
+					this.doNextMove();
+					return;
+				}				
+			}
+			else {				 		
+				 setTimeout (()=> {	
+				 	this.playSequence(this.playedList);
+				 	this.currentSelect = 0;	
+			 		this.playerTurn = true; 				 	
+				 }, 1000);
+			}
+			this.playerTurn = true;//figure out better way to lock this 
+		}, 700);////
+	}
 	
 }
 
-simonGame.prototype.playerClicked = function() { 
-	
-}
-simonGame.prototype.validateMove = function() { 
-	
+//if player select is true and it's not the last in playerList do ++
+simonGame.prototype.validateMove = function(index) { 	
+	if (this.playedList[this.currentSelect] === parseInt(index) ) {		
+		this.currentSelect++;
+		console.log("validate true");
+		return true;
+	}
+	this.currentSelect = 0;
+	console.log("validate false");
+	return false;
 }
 
-simonGame.prototype.playSequence = function(stepList = this.playedList) { //remove default maybe
-
+simonGame.prototype.playSequence = function(stepList) { //remove default maybe
+	console.log("inside playSequence stepList.length " + stepList.length);
+	console.log(this.playedList);
 	for (let i = 0; i < stepList.length; i++) {
-		setTimeout (() => {
+		setTimeout (() => {			
 			this.gameBoard.buttonBlink(stepList[i], "light");
 			this.gameBoard.playsound(stepList[i]);		
-		}, 800*i);
+		}, 700+ 700*i);
 	}
 }
+
+
+simonGame.prototype.doNextMove = function() { 	
+	this.playerTurn = false;
+	this.playedList.push(Math.floor(Math.random()*4));
+	setTimeout( () => {
+		this.playSequence(this.playedList);
+		//console.log(this.playedList); 
+	}, 1800);	
+	//this.playSequence(this.playedList);  
+	 setTimeout (()=> {		
+	 	this.playerTurn = true; 	 	
+	 }, 1500 + 700 * this.playedList.length);
+		
+}
+
 
 const testplayer = new player();
 const testgameBoard = new gameBoard();
 const testgameOption = new gameOption();
 const testgame = new simonGame(testplayer, testgameBoard, testgameOption); //for now remove maybe do without new
+testgame.init();
 
 
-simonGame.prototype.doNextMove = function() { 
-	console.log(this.playerTurn);
-		//need to check player turn?
-	this.playedlist.push(Math.floor(Math.random()*4));
-	this.playSequence(this.playedlist);  //maybe not the board doing this
-	 setTimeout (()=> {		
-	 	this.playerTurn = true; //check if "this" is corretct
-	 	console.log(this.playerTurn);
-	 }, 800*this.playedlist.length);
-		
-}
 
 
 
