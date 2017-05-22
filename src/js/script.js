@@ -48,11 +48,12 @@
 
 const lightButtons = document.querySelectorAll("div.lightButton");
 const audioFiles = document.querySelectorAll("audio.audioFile");
-const gameCounter = document.querySelector("h1.gameCounter");
+//const gameCounter = document.querySelector("h1.gameCounter");
 const startButton = document.querySelector("button#startButton");
 const strictButton = document.querySelector("button#strictButton");
 const strictLight = document.querySelector("button#strictLight");
 const onOffButton = document.querySelector("button#onOffButton");
+const gameCounter = document.querySelector("h1#gameCounter");
 
 onOffButton.addEventListener('click', gameOnOff); //change this shit
 startButton.addEventListener('click', gameStart); //change this shit
@@ -115,52 +116,64 @@ const player = function () {
 	
 }
 //remove default mabye?
-const gameBoard = function (buttons = lightButtons, sounds = audioFiles) { //add sounds as arguemnt or make it ?
+const GameBoard = function (buttons = lightButtons, sounds = audioFiles) { //add sounds as arguemnt or make it ?
 	this.buttons = buttons;
 	this.sounds = sounds;	
 }
 
-gameBoard.prototype.importSound = function(audioArr) { //not needed delte
+GameBoard.prototype.importSound = function(audioArr) { //not needed delte
 	this.sounds = audioArr;
 }
 
-gameBoard.prototype.buttonBlink = function(index, cssClass) {	
+GameBoard.prototype.buttonBlink = function(index, cssClass) {	
 	this.buttons[index].classList.add(cssClass);
 	setTimeout (() => {
 		this.buttons[index].classList.remove(cssClass);
 	}, 550);
 }
 
-gameBoard.prototype.playsound = function(index) {
+GameBoard.prototype.playsound = function(index) {
 	console.log("inside playsound " + index);
 	this.sounds[index].play();	
 }
 
-gameBoard.prototype.clickable = function() {
+GameBoard.prototype.clickable = function() {
 	
 }
 
 
 
-const gameOption = function() {
+const GameOption = function() {
 	this.onoffState = false;
 	this.gameCounterOff = "--";
 	this.gameCounter = 0;
 }
 
-gameOption.prototype.setOnOff = function() {
+GameOption.prototype.setOnOff = function() {
 	
 }
 
-gameOption.prototype.start = function() {
+GameOption.prototype.updateGameCounter = function(htmlgameCounter) {
+	htmlgameCounter.innerHTML = this.gameCounter;
+}
+
+GameOption.prototype.displayeError = function(htmlgameCounter) {	
+	htmlgameCounter.innerHTML = "!!!";
+	setTimeout (() => {
+		htmlgameCounter.innerHTML = this.gameCounter;
+	}, 550);
+}
+
+
+GameOption.prototype.start = function() {
 	
 }
 
-gameOption.prototype.setStrict = function() { //function or just value
+GameOption.prototype.setStrict = function() { //function or just value
 	
 }
 
-const simonGame = function (player, gameBoard, gameOption) {
+const SimonGame = function (player, gameBoard, gameOption) {
 	this.player = player;
 	this.gameBoard = gameBoard;
 	this.gameOption = gameOption;
@@ -170,32 +183,43 @@ const simonGame = function (player, gameBoard, gameOption) {
 }
 
 
-simonGame.prototype.init = function() { //hook up listener	
+SimonGame.prototype.init = function() { //hook up listener	
 	events.on("PlayerHasMoved", this.playerClicked.bind(this)); 	
 	events.on("StartGame", this.reStart.bind(this)); 
 }
 
-simonGame.prototype.start = function() { //remove this just restart is fine?
+SimonGame.prototype.start = function() { //remove this just restart is fine?
 	
 }
 
-simonGame.prototype.reStart = function() { //reset stuff  //call getnextmove
+SimonGame.prototype.reStart = function() { //reset stuff  //call getnextmove
 	this.playedList = [];
 	this.currentSelect = 0;
 	this.playerTurn = false;
+	this.gameOption.gameCounter = 0;
+	this.gameOption.updateGameCounter(gameCounter);	
 	this.doNextMove();
+
 }
 
 //if is full doNextMove
 //else playsequise again
-simonGame.prototype.playerClicked = function(index) {
+SimonGame.prototype.playerClicked = function(index) {
 	 if (this.playerTurn) {
-	 	this.playerTurn = false; //
-		this.gameBoard.buttonBlink(index, "light");
-		this.gameBoard.playsound(index);
-		
-		setTimeout (() =>{
-			if (this.validateMove(index)){				
+	 	this.playerTurn = false;		
+	 	let isValidMove = this.validateMove(index);
+	 	if (!isValidMove) {	 
+	 		this.gameOption.displayeError(gameCounter);
+	 		this.gameBoard.buttonBlink(index, "dark");	 
+			this.gameBoard.playsound(index);
+	 	}
+	 	else {
+	 		this.gameBoard.buttonBlink(index, "light");
+			this.gameBoard.playsound(index);
+	 	}
+
+		setTimeout(() => {				
+			if (isValidMove){				
 				if (this.currentSelect === this.playedList.length ) {					
 					this.currentSelect = 0;					
 					this.doNextMove();
@@ -204,30 +228,28 @@ simonGame.prototype.playerClicked = function(index) {
 				this.playerTurn = true;				
 			}
 			else {				
-				this.currentSelect = 0;
+				this.currentSelect = 0;//not needed already done in validate or remove the one in validate 
 				this.playSequence(this.playedList);
-			}
-			 
-		}, 700);////
-	}
-	
+			}			 
+		}, 700);
+	}	
 }
 
 //if player select is true and it's not the last in playerList do ++
-simonGame.prototype.validateMove = function(index) { 	
+SimonGame.prototype.validateMove = function(index) { 	
 	if (this.playedList[this.currentSelect] === parseInt(index) ) {		
 		this.currentSelect++;
 		console.log("validate true");
 		return true;
 	}
-	this.currentSelect = 0;
+	//this.currentSelect = 0; //remove this instead clearer
 	console.log("validate false");
 	return false;
 }
 
 
 /////// the lock out here instead 
-simonGame.prototype.playSequence = function(stepList) { //remove default maybe
+SimonGame.prototype.playSequence = function(stepList) { //remove default maybe
 	console.log("inside playSequence stepList.length " + stepList.length);
 	console.log(this.playedList);
 	this.playerTurn = false;
@@ -241,18 +263,21 @@ simonGame.prototype.playSequence = function(stepList) { //remove default maybe
 }
 
 
-simonGame.prototype.doNextMove = function() { 	
+SimonGame.prototype.doNextMove = function() { 	
 	this.playedList.push(Math.floor(Math.random()*4));
+	this.gameOption.gameCounter++;
+	
 	setTimeout( () => {
 		this.playSequence(this.playedList);		
+		this.gameOption.updateGameCounter(gameCounter);
 	}, 1000);			
 }
 
 
 const testplayer = new player();
-const testgameBoard = new gameBoard();
-const testgameOption = new gameOption();
-const testgame = new simonGame(testplayer, testgameBoard, testgameOption); //for now remove maybe do without new
+const testgameBoard = new GameBoard();
+const testgameOption = new GameOption();
+const testgame = new SimonGame(testplayer, testgameBoard, testgameOption); //for now remove maybe do without new
 testgame.init();
 
 

@@ -21,7 +21,6 @@ div#blueButton{
 	background-color:   #005ce6;
 }
 
-
 div#greenButton.light{
 	background-color:   #1aff1a;
 }
@@ -34,3 +33,18 @@ div#yelloButton.light{
 div#blueButton.light{
 	background-color: #1aa3ff;
 }
+
+div#greenButton.dark{
+	background-color: black;
+}
+div#redButton.dark{
+	background-color: black;
+}
+div#yelloButton.dark{
+	background-color: black;
+}
+div#blueButton.dark{
+	background-color: black;
+}
+
+
