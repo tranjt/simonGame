@@ -95,7 +95,7 @@ function gameOnOff() {
 }
 
 function gameStart() {
-
+	events.emit("StartGame", event.target.className.split(" ")[1]);
 // emit() game started call restart???
 //turn count on
 
@@ -172,6 +172,7 @@ const simonGame = function (player, gameBoard, gameOption) {
 
 simonGame.prototype.init = function() { //hook up listener	
 	events.on("PlayerHasMoved", this.playerClicked.bind(this)); 	
+	events.on("StartGame", this.reStart.bind(this)); 
 }
 
 simonGame.prototype.start = function() { //remove this just restart is fine?
@@ -199,16 +200,14 @@ simonGame.prototype.playerClicked = function(index) {
 					this.currentSelect = 0;					
 					this.doNextMove();
 					return;
-				}				
+				}
+				this.playerTurn = true;				
 			}
-			else {				 		
-				 setTimeout (()=> {	
-				 	this.playSequence(this.playedList);
-				 	this.currentSelect = 0;	
-			 		this.playerTurn = true; 				 	
-				 }, 1000);
+			else {				
+				this.currentSelect = 0;
+				this.playSequence(this.playedList);
 			}
-			this.playerTurn = true;//figure out better way to lock this 
+			 
 		}, 700);////
 	}
 	
@@ -226,30 +225,27 @@ simonGame.prototype.validateMove = function(index) {
 	return false;
 }
 
+
+/////// the lock out here instead 
 simonGame.prototype.playSequence = function(stepList) { //remove default maybe
 	console.log("inside playSequence stepList.length " + stepList.length);
 	console.log(this.playedList);
+	this.playerTurn = false;
 	for (let i = 0; i < stepList.length; i++) {
 		setTimeout (() => {			
 			this.gameBoard.buttonBlink(stepList[i], "light");
-			this.gameBoard.playsound(stepList[i]);		
-		}, 700+ 700*i);
+			this.gameBoard.playsound(stepList[i]);
+			if(i === (stepList.length-1)) this.playerTurn = true;
+		}, 700 + 700*i);
 	}
 }
 
 
 simonGame.prototype.doNextMove = function() { 	
-	this.playerTurn = false;
 	this.playedList.push(Math.floor(Math.random()*4));
 	setTimeout( () => {
-		this.playSequence(this.playedList);
-		//console.log(this.playedList); 
-	}, 1800);	
-	//this.playSequence(this.playedList);  
-	 setTimeout (()=> {		
-	 	this.playerTurn = true; 	 	
-	 }, 1500 + 700 * this.playedList.length);
-		
+		this.playSequence(this.playedList);		
+	}, 1000);			
 }
 
 
