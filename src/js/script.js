@@ -62,11 +62,11 @@ function strictOnOff() {
 /*
 	Game Board
 */
-
 const GameBoard = function (buttons, sounds) { 
 	this.buttons = buttons;
 	this.sounds = sounds;	
 }
+
 //Light Button blink by changing to a lighter/darker background color with css class
 //then back to orginal after preset time 550 ms.
 GameBoard.prototype.buttonBlink = function(index, cssClass) {	
@@ -175,23 +175,23 @@ SimonGame.prototype.handlePlayerClick = function(index) {
 	 if (this.playerTurn && this.gameOption.onoffState) {
 	 	//lock out player after click 	 	
 	 	this.playerTurn = false;
-	 	//check if corrent light button clicked 		
+	 	//check if correct light button is clicked 		
 	 	let isValidMove = this.validateMove(index);	
-	 	//display right/wrong button clicked
+	 	//display right/wrong light button clicked
 	 	this.buttonLightResponse(isValidMove, index);
 	 	//make sure 600ms have past before continue
 	 	//to ensure the sound and blink can complete
 		setTimeout(() => {				
 			if (isValidMove) {
 				this.currentSelect++;
-				//check if player got the whole current sound sequense correct								 				
+				//check if player got the whole current sound sequence correct								 				
 				if (this.currentSelect === this.playedList.length) {
-					//check if game is over, game is over if player get 20 correct in a row
+					//check if game is over, game is over if player get 20 sound sequence correct in a row
 					if (this.gameOption.gameCounter === 20) {
 						this.gameOver();
 						return;
 					}
-					//if not over get next playsequense				
+					//if not over get next playsequence				
 					this.doNextMove(isValidMove);
 					return;
 				}
@@ -203,7 +203,7 @@ SimonGame.prototype.handlePlayerClick = function(index) {
 					this.reStart();
 					return;
 				}
-				//if player got a wrong light button state and replay sound sequense from the start
+				//if player got a wrong light button state and replay sound sequence from the start
 				else {			
 					this.doNextMove(isValidMove);
 				}	
@@ -212,7 +212,7 @@ SimonGame.prototype.handlePlayerClick = function(index) {
 	}	
 }
 
-//display right/wrong button clicked
+//display right/wrong light button clicked
 SimonGame.prototype.buttonLightResponse = function(isValidMove, lightButtonIndex) { 	
 		if (isValidMove) {
 	 		this.gameBoard.buttonBlink(lightButtonIndex, "light");
@@ -225,14 +225,14 @@ SimonGame.prototype.buttonLightResponse = function(isValidMove, lightButtonIndex
 	 	}
 }
 
-//handle game over display a win msg
+//handle game over display a win message
 SimonGame.prototype.gameOver = function() { 	
 		gameAnnouncementText.innerHTML = "Congratulations you have won!";
 		wrapper.classList.remove('hidden');
 		gameAnnouncement.classList.remove('hidden');
 }
 
-//make sure light buttons is clicked in correct sequense
+//make sure light buttons are clicked in correct sequence
 SimonGame.prototype.validateMove = function(index) { 	
 	if (this.playedList[this.currentSelect] === parseInt(index) ) {			
 		return true;
@@ -240,23 +240,23 @@ SimonGame.prototype.validateMove = function(index) {
 	return false;
 }
 
-//play sound/light sequense
+//play sound/light sequence
 SimonGame.prototype.playSequence = function(stepList) { 
-	//make sure player can't click while playing the sequense
+	//make sure player can't click light button while playing the sequence
 	this.playerTurn = false;
 	for (let i = 0; i < stepList.length; i++) {
 		//make sure each sound/light is played 600ms apart
 		setTimeout(() => {			
 			this.gameBoard.buttonBlink(stepList[i], "light");
 			this.gameBoard.playsound(stepList[i]);
-			//enable player click after sequense is done
+			//enable player click after sequence is done
 			if (i === (stepList.length-1)) this.playerTurn = true;
 		}, 600*i);
 	}
 }
 
-//handles generation of new state to sound/light sequense and play the sequense
-//doNext value dictates if new state should be made and added to current sound/light sequense or not
+//handles generation of new state to sound/light sequence and play the sequence
+//doNext value dictates if new state should be made and added to current sound/light sequence or not
 SimonGame.prototype.doNextMove = function(doNext) { 
 	this.currentSelect = 0;		
 	if (doNext) {
@@ -264,7 +264,7 @@ SimonGame.prototype.doNextMove = function(doNext) {
 		this.gameOption.gameCounter++;
 		this.gameOption.updateGameCounter(gameCounter);
 	}
-	//delay 1500ms before playing the current sound/light sequense 
+	//delay 1500ms before playing the current sound/light sequence 
 	setTimeout(() => {		
 		this.playSequence(this.playedList);				
 	}, 1500);				
