@@ -1,3 +1,18 @@
+body {
+	background-color: #EEF2FF;
+}
+
+div#wrapper {
+	position:fixed; 
+	left:0; 
+	top:0; 
+	width:100%; 
+	height:100%;
+	z-index: 40;
+	background: rgba(32, 80, 129, 0.5);
+}
+
+
 div#gameCointaner {
 	width: 520px;
 	height: 520px; 
@@ -9,6 +24,7 @@ div#gameCointaner {
 	overflow: hidden;
 	border-radius: 50%;
 	border: solid 10px black;	
+
 }
 
 div#greenButton{
@@ -78,7 +94,6 @@ div#blueButton.dark{
 	background-color: #252930;
 }
 
-
 div#optionController{
 	position: absolute;
 	width: 280px;
@@ -116,6 +131,8 @@ h1#simonTitle {
 	top: 20px;
 	left: calc(50% - 200px/2);
 	font-weight: 900;
+	user-select: none;
+	cursor: default;	
 }
 
 h1#gameCounter {
@@ -126,10 +143,12 @@ h1#gameCounter {
 	position: absolute;
 	top: 75px;
 	left: calc(50% - 110px/2);
-	color:  #ff0000;
+	color: #ff0000;
 	border: solid 5px black;
 	border-radius: 5px;
 	font-family: Arial;
+	user-select: none;
+	cursor: default;	
 }
 
 h3#gameCounter {
@@ -140,8 +159,9 @@ h3#gameCounter {
 	top: 120px;
 	font-size:17px;
 	left: calc(50% - 100px/2);	
+	user-select: none;
+	cursor: default;	
 }
-
 
 div#startGame {	
 	width: 200px;
@@ -152,14 +172,11 @@ div#startGame {
 	left: calc(50% - 200px/2);
 }
 
-
 div#onOff{
 	display: inline-block;
-
 	width: 200px;
 	height: 44px;
-	text-align: center;
-	//background-color: brown;
+	text-align: center;	
 	position: absolute;
 	top: 220px;
 	left: calc(50% - 200px/2);
@@ -203,7 +220,46 @@ button#strictButton.strict {
 	color: red;	
 }
 
-
 button#onOffButton {
 	color: black;
+}
+
+div#gameAnnouncement {
+	width: 500px;
+	height: 200px;
+	background-color: white;
+	position: absolute;
+	z-index: 1000;
+	background: rgba(204, 204, 204, 1);
+	background-color: white;
+	top: calc(50% - 200px/2);
+	left: calc(50% - 500px/2);
+	border-radius: 14px;
+	font-size: 36px;
+	text-align: center;
+	padding-top: 20px;
+	overflow: show;
+
+
+}
+
+div#gameAnnouncementText {
+	text-align: center;
+	font-size: 36px;
+	width: 500px;	
+	color: black;	
+	font-family:Arial;
+	font-weight:bold;	
+	text-align: center;		
+
+
+}
+
+button#okButton {
+	color: black;
+	margin-top: 30px;	
+}
+
+.hidden{
+	display: none;
 }

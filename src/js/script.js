@@ -5,9 +5,14 @@ const strictLightButton = document.querySelector("button#strictButton");
 const onOffButton = document.querySelector("button#onOffButton");
 const gameCounter = document.querySelector("h1#gameCounter");
 
+const gameAnnouncement = document.querySelector("div#gameAnnouncement");
+const gameAnnouncementText = document.querySelector("div#gameAnnouncementText");
+const okButton = document.querySelector("button#okButton");
+
 strictLightButton.addEventListener('click', strictOnOff);
 onOffButton.addEventListener('click', gameOnOff); 
 startButton.addEventListener('click', gameStart); 
+okButton.addEventListener('click', gameStart);
 lightButtons.forEach(function(button) {
 	button.addEventListener('click', makeMove); 
 });
@@ -55,7 +60,10 @@ function strictOnOff() {
 	events.emit("StrictOnOff", strictLightButton);
 }
 
-
+// //Ok button, Restart game once game is over
+// function confirm(event){
+// 	events.emit("StartGame", "");
+// }
 /*
 	Game Board
 */
@@ -90,7 +98,10 @@ GameOption.prototype.setOnOff = function() {
 		this.gameOption.gameCounter = 0;
 	}
 	else {
-		this.gameOption.gameCounter = "";
+		this.gameOption.gameCounter = "";		
+		this.playedList = [];
+		this.currentSelect = 0;
+		this.playerTurn = false;
 		this.gameOption.strict = false;
 		strictLightButton.classList.remove("strict");	
 	}
@@ -132,14 +143,17 @@ SimonGame.prototype.init = function() { //hook up listener
 	events.on("StartGame", this.reStart.bind(this)); 
 	events.on("TurnOnOff", this.gameOption.setOnOff.bind(this));	
 	events.on("StrictOnOff", this.gameOption.setStrict.bind(this));	
+	//events.on("StartGame", this.reStart.bind(this));
 }
 
 SimonGame.prototype.reStart = function() { 
 	if (this.gameOption.onoffState) {
+		gameAnnouncement.classList.add('hidden');
+		wrapper.classList.add('hidden');
 		this.playedList = [];
 		this.currentSelect = 0;
 		this.playerTurn = false;
-		this.gameOption.gameCounter = 0;
+		this.gameOption.gameCounter = 0;		
 		this.gameOption.updateGameCounter(gameCounter);	
 		this.doNextMove();
 	}
@@ -162,7 +176,14 @@ SimonGame.prototype.handlePlayerClick = function(index) {
 		setTimeout(() => {				
 			if (isValidMove) {
 				this.currentSelect++;	 				
-				if (this.currentSelect === this.playedList.length ) {					
+				if (this.currentSelect === this.playedList.length ) {
+
+					if(this.gameOption.gameCounter === 20) {
+						gameAnnouncementText.innerHTML = "Congratulations you have won!";
+						wrapper.classList.remove('hidden');
+						gameAnnouncement.classList.remove('hidden');
+						return;
+					}
 					this.currentSelect = 0;					
 					this.doNextMove();
 					return;
@@ -219,4 +240,4 @@ newgame.init();
 
 
 //User Story: I can win the game by getting a series of 20 steps correct. I am notified of my victory, then the game starts over.
-//do a wrapper display msg on top, ok button restart game 
+//do a wrapper display msg on top when 20 reached, ok button restart game 
